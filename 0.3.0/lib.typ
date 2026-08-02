@@ -222,8 +222,29 @@
       }
     }
   }
+
+  show outline.entry: it => if (it.element.func() != figure) { return it } else if (
+    it.element.func().kind not in trans-array
+  ) { return it } else {
+    for k in trans-array {
+      let it.element.numbering = context (
+        counter(heading.where(level: 1)).display("1.", at: it.element.location())
+          + counter(figure.where(kind: k)).display("a", at: it.element.location())
+      )
+      link(
+        it.element.location(),
+        // Keep just the body, dropping
+        // the fill and the page.
+        it.indented(it.prefix(), it.body()),
+      )
+    }
+  }
   doc
 }
+
+
+
+
 
 
 // #example[

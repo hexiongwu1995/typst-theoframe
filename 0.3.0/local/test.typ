@@ -12,7 +12,13 @@
 
 == Table of Theorems
 
-#outline(title: none, target: figure.where(kind: "Theorem"))
+#outline(title: none, target: figure.where(kind: "Definition") .or(figure.where(kind: "Postulate")) )
+
+// #context query(outline)
+
+// #outline(title: none, target: figure.where(context figure.kind in trans-array) )
+
+
 
 = Basic Theorem Environments
 
