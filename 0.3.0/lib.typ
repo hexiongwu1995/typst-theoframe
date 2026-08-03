@@ -198,8 +198,7 @@
   show ref: it => {
     if (it.element.func() != figure) {
       return it
-    } else {
-      if (it.element.func().kind not in trans-array) { return it } else {
+    } else if (it.element.kind not in trans-array) { return it } else {
         let k = it.element.kind
         let ref-content = context {
           let loc = it.element.location()
@@ -213,7 +212,6 @@
         )
       }
     }
-  }
 
   show outline.entry: it => if (it.element.func() != figure) { return it } else if (
     it.element.kind not in trans-array
