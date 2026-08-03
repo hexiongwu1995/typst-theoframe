@@ -1,5 +1,5 @@
 
-#import "./lib1.typ":*
+#import "./lib2.typ":*
 // #import "@preview/theoframe:0.2.0"
 #show: reset
 
