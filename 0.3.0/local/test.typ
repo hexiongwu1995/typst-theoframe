@@ -12,11 +12,10 @@
 
 == Table of Theorems
 
-#outline(title: none, target: figure.where(kind: "Definition") .or(figure.where(kind: "Postulate")) )
 
-// #context query(outline)
+#let sel-array = trans-array.map(i => figure.where(kind: i))
+#outline(title: none, target: selector.or(..sel-array))
 
-// #outline(title: none, target: figure.where(context figure.kind in trans-array) )
 
 
 

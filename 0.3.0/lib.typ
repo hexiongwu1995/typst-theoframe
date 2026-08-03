@@ -15,21 +15,11 @@
   conclusion: (en: "Conclusion", fr: "Conclusion", ko: "결론", ja: "結論", zh: "结论"),
 )
 
-#let trans-array = (
-  "Definition",
-  "Postulate",
-  "Assumption",
-  "Conjecture",
-  "Proposition",
-  "Lemma",
-  "Proof",
-  "Theorem",
-  "Corollary",
-  "Example",
-  "Problem",
-  "Solution",
-  "Conclusion",
-)
+// #let trans-array = trans.keys().map(k => trans.at(k).en)
+
+#let trans-array = trans.values().map(v => v.en)
+
+
 
 
 #let theoframe(name: [], framename: [], kind: "", color: none, it) = figure(
@@ -210,35 +200,37 @@
       return it
     } else {
       if (it.element.func().kind not in trans-array) { return it } else {
-        for k in trans-array {
-          link(
-            it.element.location(),
-            context (
-              counter(heading.where(level: 1)).display("1.", at: it.element.location())
-                + counter(figure.where(kind: k)).display("a", at: it.element.location())
-            ),
-          )
+        let k = it.element.kind
+        let ref-content = context {
+          let loc = it.element.location()
+          let h-counter = counter(heading.where(level: 1)).at(loc)
+          let f-counter = counter(figure.where(kind: k)).at(loc)
+          it.element.supplement + " " + numbering("1.", ..h-counter) + numbering("a", ..f-counter)
         }
+        link(
+          it.element.location(),
+          ref-content,
+        )
       }
     }
   }
 
   show outline.entry: it => if (it.element.func() != figure) { return it } else if (
-    it.element.func().kind not in trans-array
+    it.element.kind not in trans-array
   ) { return it } else {
-    for k in trans-array {
-      let it.element.numbering = context (
-        counter(heading.where(level: 1)).display("1.", at: it.element.location())
-          + counter(figure.where(kind: k)).display("a", at: it.element.location())
-      )
-      link(
-        it.element.location(),
-        // Keep just the body, dropping
-        // the fill and the page.
-        it.indented(it.prefix(), it.body()),
-      )
+    let k = it.element.kind
+    let prefix = context {
+      let loc = it.element.location()
+      let h-counter = counter(heading.where(level: 1)).at(loc)
+      let f-counter = counter(figure.where(kind: k)).at(loc)
+      it.element.supplement + " " + numbering("1.", ..h-counter) + numbering("a", ..f-counter)
     }
+    link(
+      it.element.location(),
+      it.indented(prefix, it.inner()),
+    )
   }
+
   doc
 }
 
