@@ -1,3 +1,6 @@
+// theoframe: A Typst package providing 13 theorem-like environments (e.g., Definition, Theorem, Proof)
+// with automatic section-based numbering, multilingual localization, and customizable color themes.
+// Implemented on top of native figure and counter primitives.
 
 #let trans = (
   definition: (en: "Definition", fr: "Définition", ko: "정의", ja: "定義", zh: "定义"),
@@ -17,34 +20,38 @@
 
 #let trans-array = trans.values().map(v => v.en)
 
-// 核心编号函数：始终基于设置的位置计算 "1.a"
+// Generate a composite figure numbering for the given figure kind and location
 #let theo-number(kind, loc) = context {
   let h-counter = counter(heading.where(level: 1)).at(loc)
   let f-counter = counter(figure.where(kind: kind)).at(loc)
   numbering("1.", ..h-counter) + numbering("a", ..f-counter)
 }
 
-// 核心标题函数：始终基于元素的位置计算标题内容
+// Generate the full caption string for the given figure element
+// By combining the element's supplement with its  composite numbering at the element location.
 #let theo-cap-title(element) = context {
   let loc = element.location()
   element.supplement + " " + theo-number(element.kind, loc)
 }
 
 
+// Bordered theorem environment: renders a rectangular frame with a colored left stroke,
+// a tinted header bar displaying the title and number, and a dedicated content area.
 #let theoframe(name: [], framename: [], kind: "", color: none, it) = figure(
-  rect(
+  block(
     width: 100%,
     stroke: (left: 2pt + color),
     inset: 0em,
   )[
-    #stack(dir: ttb, spacing: 0em)[
-      #rect(width: 100%, inset: 1em, outset: 0em, fill: color.lighten(80%).transparentize(70%))[
-        #align(left)[#text(fill: color, weight: 700)[#framename #context theo-number(kind, here()) #h(1em) ] #text(weight: 500)[#name]]
+      #block(width: 100%, inset: 1em, outset: 0em, below: 0em, fill: color.lighten(80%).transparentize(70%))[
+        #align(left)[#text(fill: color, weight: 700)[#framename #context theo-number(kind, here()) #h(1em) ] #text(
+            weight: 500,
+          )[#name]]
       ]
-      #rect(width: 100%, inset: 1em, outset: 0em, fill: color.lighten(80%).transparentize(90%))[
+      #block(width: 100%, inset: 1em, outset: 0em, above:0em, fill: color.lighten(80%).transparentize(90%))[
         #align(left)[#it]
       ]
-    ]
+
   ],
   kind: kind,
   supplement: framename,
@@ -54,6 +61,8 @@
 )
 
 
+// Minimal theorem environment: presents the heading and content inline without a surrounding border,
+// appending a customizable trailing symbol (e.g., a Q.E.D. marker).
 #let theocolor(name: [], framename: [], kind: "", color: none, sym, it) = figure(
   rect(
     width: 100%,
@@ -69,7 +78,7 @@
   ],
   kind: kind,
   supplement: framename,
-  numbering:  _ => context theo-number(kind, here()),
+  numbering: _ => context theo-number(kind, here()),
   outlined: true,
   caption: none,
 )
@@ -183,39 +192,43 @@
   it,
 )
 
-#let reset(doc) = {
-  set heading(numbering: "1.1")
-  show heading.where(level: 1): it => {
-    for k in trans-array {
-      counter(figure.where(kind: k)).update(0)
-    }
-    it
+
+#let reset-fig-counter-per-level1-heading(it) = {
+  for k in trans-array {
+    counter(figure.where(kind: k)).update(0)
   }
-
-  show ref: set text(fill: blue)
-
-  show ref: it => {
-    if (it.element.func() != figure) {
-      return it
-    } else if (it.element.kind not in trans-array) { return it } else {
-
-      link(
-        it.element.location(),
-        theo-cap-title(it.element),
-      )
-    }
-  }
-
-  show outline.entry: it => if (it.element.func() != figure) { return it } else if (
-    it.element.kind not in trans-array
-  ) { return it } else {
-    link(
-      it.element.location(),
-      it.indented(theo-cap-title(it.element), it.inner()),
-    )
-  }
-  
-  doc
+  it
 }
 
+#let refer(it) = {
+  set text(fill: blue)
+  if (it.element.func() != figure) {
+    return it
+  } else if (it.element.kind not in trans-array) { return it } else {
+    link(
+      it.element.location(),
+      theo-cap-title(it.element),
+    )
+  }
+}
 
+#let outline-entry(it) = if (it.element.func() != figure) { return it } else if (
+  it.element.kind not in trans-array
+) { return it } else {
+  link(
+    it.element.location(),
+    it.indented(theo-cap-title(it.element), it.inner()),
+  )
+}
+
+#let reset(doc) = {
+  set heading(numbering: "1.1")
+
+  show heading.where(level: 1): it => reset-fig-counter-per-level1-heading(it)
+
+  show ref: it => refer(it)
+
+  show outline.entry: it => outline-entry(it)
+
+  doc
+}
