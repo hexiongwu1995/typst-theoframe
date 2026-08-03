@@ -3,20 +3,24 @@
 // #import "@preview/theoframe:0.2.0"
 #show: reset
 
-#set page(width: 210mm, height: auto, margin: 1cm)
+#set page(width: 210mm, height: 297mm, margin: 1cm)
 
-#show heading: set text(fill: rgb("#0051ff"))
+#show heading.where(level:1): set text(fill: rgb("#0051ff"))
 
+#show outline: it => {
+  show heading: set text(fill: rgb("#000000"))  
+  // outline 的 title 通常以 heading 形式渲染
+  it
+}
 
 = Theorion Environments
 
-== Table of Theorems
-
-
 #let sel-array = trans-array.map(i => figure.where(kind: i))
-#outline(title: none, target: selector.or(..sel-array))
+#outline(title: "Table of Theorems", target: selector.or(..sel-array))
 
 
+#outline(title: "Definitions", target: figure.where(kind: "Definition"))
+#outline(title: "Theorems", target: figure.where(kind: "Theorem"))
 
 
 = Basic Theorem Environments
@@ -32,6 +36,7 @@ Let's start with the most fundamental definition.
   The numbers $2$, $3$, and $17$ are prime. As proven in @cor:infinite-prime,
   this list is far from complete! See @thm:euclid for the full proof.
 ]
+
 
 #assumption[
   For all $n in NN$, assume $n$ is even if $n = 2k$ for some $k in NN$.

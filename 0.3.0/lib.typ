@@ -46,7 +46,7 @@
     counter-content
   },
   outlined: true,
-  caption: [],
+  caption: none,
 )
 
 
@@ -72,7 +72,7 @@
     counter-content
   },
   outlined: true,
-  caption: [],
+  caption: none,
 )
 
 
@@ -199,19 +199,19 @@
     if (it.element.func() != figure) {
       return it
     } else if (it.element.kind not in trans-array) { return it } else {
-        let k = it.element.kind
-        let ref-content = context {
-          let loc = it.element.location()
-          let h-counter = counter(heading.where(level: 1)).at(loc)
-          let f-counter = counter(figure.where(kind: k)).at(loc)
-          it.element.supplement + " " + numbering("1.", ..h-counter) + numbering("a", ..f-counter)
-        }
-        link(
-          it.element.location(),
-          ref-content,
-        )
+      let k = it.element.kind
+      let ref-content = context {
+        let loc = it.element.location()
+        let h-counter = counter(heading.where(level: 1)).at(loc)
+        let f-counter = counter(figure.where(kind: k)).at(loc)
+        it.element.supplement + " " + numbering("1.", ..h-counter) + numbering("a", ..f-counter)
       }
+      link(
+        it.element.location(),
+        ref-content,
+      )
     }
+  }
 
   show outline.entry: it => if (it.element.func() != figure) { return it } else if (
     it.element.kind not in trans-array
@@ -221,6 +221,7 @@
       let loc = it.element.location()
       let h-counter = counter(heading.where(level: 1)).at(loc)
       let f-counter = counter(figure.where(kind: k)).at(loc)
+      // set text(fill: green)
       it.element.supplement + " " + numbering("1.", ..h-counter) + numbering("a", ..f-counter)
     }
     link(
